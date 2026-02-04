@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Универсальный калькулятор 🧮</title>
+<style>
+  body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 30px;
+  background: url('sponge.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  position: relative;
+}
+
+/* затемнение */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); /* прозрачный чёрный слой */
+  z-index: -1;
+}
+
+  input, select, button {
+    padding: 10px;
+    margin: 5px;
+    font-size: 16px;
+  }
+  #result {
+  color: #ffff66; /* светло-жёлтый */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* тень для читаемости */
+  font-weight: bold;
+  font-size: 24px;
+  background: rgba(0, 0, 0, 0.5); /* полупрозрачный чёрный фон */
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+  }
+</style>
+</head>
+<body>
+
+<h1>Нурстын калькуляторы</h1>
+
+<div class="operation-section">
+  <h2>Арифметика</h2>
+  <input id="expr" type="text" placeholder="Например: 2 + 3 * 4">
+  <button onclick="calculateExpr()">жауабы</button>
+</div>
+
+<div class="operation-section">
+  <h2>тубырасты,синус,косинуско</h2>
+  <input id="number" type="number" placeholder="жаз ал">
+  <select id="operation">
+    <option value="sqrt">√ тубырасты</option>
+    <option value="sin">sin (градус)</option>
+    <option value="cos">cos (градус)</option>
+    <option value="tan">tan (градус)</option>
+    <option value="cot">cot (градус)</option>
+  </select>
+  <button onclick="calculate()">шыгар</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+// Перевод градусов в радианы
+function degToRad(deg) {
+  return deg * Math.PI / 180;
+}
+
+// Арифметика
+function calculateExpr() {
+  const expr = document.getElementById('expr').value;
+  try {
+    const result = eval(expr);
+
+    // Разрешаем +, -, *, пробелы, цифры, но НЕ /
+    const isSimple = /^[0-9+\-*\s]+$/.test(expr); 
+    const numbers = expr.match(/\d+/g)?.map(Number) || [];
+
+    // Проверка: все числа ≤ 20, результат ≤ 20, и нет деления
+    const hasDivision = expr.includes('/');
+    
+    let extraMsg = "";
+    if (isSimple && !hasDivision && numbers.every(n => n <= 20) && Math.abs(result) <= 20) {
+      extraMsg = " 👍 о тупой сурайтын зат тауыпсын";
+    }
+
+    document.getElementById('result').textContent = `${expr} = ${result}${extraMsg}`;
+  } catch (e) {
+    alert("брат болатын есеп жазсай");
+  }
+}
+
+// Специальные функции
+function calculate() {
+  const num = parseFloat(document.getElementById('number').value);
+  const op = document.getElementById('operation').value;
+
+  if (isNaN(num)) {
+    alert("нормально жазе");
+    return;
+  }
+
+  let result;
+
+  switch(op) {
+    case 'sqrt':
+      result = (num < 0) ? "кателык: сан нолден кышы!" : `√${num} = ${Math.sqrt(num).toFixed(4)}`;
+      break;
+
+    case 'sin':
+      result = `sin(${num}°) = ${Math.sin(degToRad(num)).toFixed(4)}`;
+      break;
+
+    case 'cos':
+      result = `cos(${num}°) = ${Math.cos(degToRad(num)).toFixed(4)}`;
+      break;
+
+    case 'tan':
+      const radTan = degToRad(num);
+      result = (Math.cos(radTan) === 0) ? `tan(${num}°) ондай жок екен брат` : `tan(${num}°) = ${Math.tan(radTan).toFixed(4)}`;
+      break;
+
+    case 'cot':
+      const radCot = degToRad(num);
+      result = (Math.sin(radCot) === 0) ? `cot(${num}°) ондай жок екен брат` : `cot(${num}°) = ${(1/Math.tan(radCot)).toFixed(4)}`;
+      break;
+
+    default:
+      result = "не то нарсе жазып койдым деп ойламайсынба!";
+  }
+
+  document.getElementById('result').textContent = result;
+}
+</script>
+
+</body>
+</html>
+
